@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/Mock.js/1.0.1-beta3/mock-min.js"></script>
+</head>
+
+<body>
+  页码：<input type="text" name="page" value="1">
+  数量：<input type="text" name="num">
+  <button type="button" id="submit">提交</button>
+  <pre></pre>
+</body>
+<script>
+  $(function () {
+    let num
+    $("#submit").click(function () {
+      num = $("input[name=num]").val() || 1
+      $.ajax({
+        url: 'http://api/lists',
+        type: 'get',
+        dataType: "json",
+        data: {
+          page: 1,
+          num: num
+        }
+      }).done(function (data, status, xhr) {
+        $('pre').html(JSON.stringify(data, null, 2))
+      })
+    })
+    Mock.mock(/api/, function (options) {
+      console.log(options)
+      return Mock.mock({
+        "status": 0,
+        ["data|" + num]: [
+          {
+            "tid|+1": 1,
+            "title": "@string('number',8)",
+            "catalog": "@string('lower',5)",
+            "fav": "@integer(10,99)",
+            "created": "@string('number',9)",
+            "isEnd": "@character('10')",
+            "answer": "10",
+            "user": {
+              "avatar": "@image()",
+              "name": "@ctitle()",
+              "isVip": "1",
+              "level": "4"
+            }
+          }
+        ],
+        "msg": "返回Mock数据"
+      })
+    })
+  })
+</script>
+
+</html>
